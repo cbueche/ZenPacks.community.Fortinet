@@ -1,0 +1,359 @@
+name: ZenPacks.community.Fortinet
+
+classes:
+
+    FortigateDevice:
+        base: [zenpacklib.Device]
+        label: Fortigate
+
+    FortigateSensor:
+        base: [zenpacklib.Component]
+        label: Sensor
+        properties:
+            svalue:
+                label: svalue
+                order: 20
+            status:
+                label: status
+                order: 30
+                enum: {0: 'ok', 1: 'faulty'}
+        monitoring_templates:
+            - FortigateSensorHealth
+
+    FortigateVdom:
+        base: [zenpacklib.Component]
+        label: Vdom
+        properties:
+            opmode:
+                label: Mode
+                order: 20
+                enum: {1: 'NAT', 2: 'transparent'}
+            hastate:
+                label: HA state
+                order: 30
+                enum: {1: 'master', 2: 'backup', 3: 'standalone'}
+        monitoring_templates:
+            - FortigateVdomHealth
+
+    FortigateIPS:
+        base: [zenpacklib.Component]
+        label: IPS
+        plural_label: IPS
+        properties:
+            intrusions_detected:
+                label: Detected
+                order: 10
+            intrusions_blocked:
+                label: Blocked
+                order: 20
+        monitoring_templates:
+            - FortigateIPSHealth
+
+class_relationships:
+  - FortigateDevice 1:MC FortigateSensor
+  - FortigateDevice 1:MC FortigateVdom
+  - FortigateDevice 1:MC FortigateIPS
+
+device_classes:
+
+    /Network/Firewall/Fortigate:
+
+        zProperties:
+            zDeviceTemplates:
+                - Fortigate
+            zPythonClass: ZenPacks.community.Fortinet.FortigateDevice
+            zSnmpMonitorIgnore: false
+            zCollectorPlugins:
+                # modelers from Zenoss
+                - zenoss.snmp.NewDeviceMap
+                - zenoss.snmp.DeviceMap
+                - zenoss.snmp.InterfaceMap
+                - zenoss.snmp.InterfaceAliasMap
+                - zenoss.snmp.RouteMap
+                # modelers from ZenPacks.community.Fortinet
+                - community.snmp.FortigateGlobal
+                - community.snmp.FortigateSensor
+                - community.snmp.FortigateVdom
+                - community.snmp.FortigateIPS
+
+        templates:
+
+            # this is a first shot that should probably be enhanced when we have
+            # real data. Eg.g. by stacking the detections in a single graph.
+            FortigateIPSHealth:
+                datasources:
+                    intrusionsdetected:
+                        type: SNMP
+                        datapoints:
+                            intrusionsdetected: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.9.2.1.1.1
+                    intrusionsblocked:
+                        type: SNMP
+                        datapoints:
+                            intrusionsblocked: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.9.2.1.1.2
+                    criticalsevdetections:
+                        type: SNMP
+                        datapoints:
+                            criticaldetections: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.9.2.1.1.3
+                    highsevdetections:
+                        type: SNMP
+                        datapoints:
+                            highsevdetections: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.9.2.1.1.4
+                    mediumsevdetections:
+                        type: SNMP
+                        datapoints:
+                            mediumsevdetections: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.9.2.1.1.5
+                    lowsevdetections:
+                        type: SNMP
+                        datapoints:
+                            lowsevdetections: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.9.2.1.1.6
+                    infosevdetections:
+                        type: SNMP
+                        datapoints:
+                            infosevdetections: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.9.2.1.1.7
+                    signaturedetections:
+                        type: SNMP
+                        datapoints:
+                            signaturedetections: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.9.2.1.1.8
+                    anomalydetections:
+                        type: SNMP
+                        datapoints:
+                            anomalydetections: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.9.2.1.1.9
+                graphs:
+                    Intrusions-detected:
+                        miny: 0
+                        graphpoints:
+                            intrusionsdetected:
+                                dpName: intrusionsdetected_intrusionsdetected
+                                lineType: AREA
+                        comments:
+                            - Vdom intrusions detected
+                    Intrusions-blocked:
+                        miny: 0
+                        graphpoints:
+                            intrusionsblocked:
+                                dpName: intrusionsblocked_intrusionsblocked
+                                lineType: AREA
+                        comments:
+                            - Vdom intrusions blocked
+                    Intrusions-critical:
+                        miny: 0
+                        graphpoints:
+                            criticalsevdetections:
+                                dpName: criticalsevdetections_criticalsevdetections
+                                lineType: AREA
+                        comments:
+                            - Vdom critical severity intrusions
+                    Intrusions-high:
+                        miny: 0
+                        graphpoints:
+                            highsevdetections:
+                                dpName: highsevdetections_highsevdetections
+                                lineType: AREA
+                        comments:
+                            - Vdom high severity intrusions
+                    Intrusions-medium:
+                        miny: 0
+                        graphpoints:
+                            mediumsevdetections:
+                                dpName: mediumsevdetections_mediumsevdetections
+                                lineType: AREA
+                        comments:
+                            - Vdom medium severity intrusions
+                    Intrusions-low:
+                        miny: 0
+                        graphpoints:
+                            lowsevdetections:
+                                dpName: lowsevdetections_lowsevdetections
+                                lineType: AREA
+                        comments:
+                            - Vdom low severity intrusions
+                    Intrusions-info:
+                        miny: 0
+                        graphpoints:
+                            infosevdetections:
+                                dpName: infosevdetections_infosevdetections
+                                lineType: AREA
+                        comments:
+                            - Vdom info severity intrusions
+                    Intrusions-signature:
+                        miny: 0
+                        graphpoints:
+                            signaturedetections:
+                                dpName: signaturedetections_signaturedetections
+                                lineType: AREA
+                        comments:
+                            - Vdom intrusions detected by signature
+                    Intrusions-anomaly:
+                        miny: 0
+                        graphpoints:
+                            anomalydetections:
+                                dpName: anomalydetections_anomalydetections
+                                lineType: AREA
+                        comments:
+                            - Vdom intrusions detected as anomalies
+
+            FortigateVdomHealth:
+                datasources:
+                    cpuusage:
+                        type: SNMP
+                        datapoints:
+                            cpuusage: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.3.2.1.1.5
+                    memusage:
+                        type: SNMP
+                        datapoints:
+                            memusage: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.3.2.1.1.6
+                    sescount:
+                        type: SNMP
+                        datapoints:
+                            sescount: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.3.2.1.1.7
+                    sesrate:
+                        type: SNMP
+                        datapoints:
+                            sesrate: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.3.2.1.1.8
+                graphs:
+                    CPU-usage:
+                        miny: 0
+                        maxy: 100
+                        graphpoints:
+                            cpuusage:
+                                dpName: cpuusage_cpuusage
+                                lineType: AREA
+                        comments:
+                            - Vdom CPU usage in percents
+                    MEM-usage:
+                        miny: 0
+                        maxy: 100
+                        graphpoints:
+                            memusage:
+                                dpName: memusage_memusage
+                                lineType: AREA
+                        comments:
+                            - Vdom memory usage in percents
+                    Sessions-count:
+                        miny: 0
+                        graphpoints:
+                            sescount:
+                                dpName: sescount_sescount
+                                lineType: AREA
+                        comments:
+                            - Vdom active sessions
+                    Sessions-rate:
+                        miny: 0
+                        graphpoints:
+                            sesrate:
+                                dpName: sesrate_sesrate
+                                lineType: AREA
+                        comments:
+                            - Vdom session setup rate
+
+            FortigateSensorHealth:
+                datasources:
+                    sensorstatus:
+                        type: SNMP
+                        datapoints:
+                            sensorstatus: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.4.3.2.1.4
+                    sensorvalue:
+                        type: SNMP
+                        datapoints:
+                            sensorvalue: INTEGER
+                        oid: 1.3.6.1.4.1.12356.101.4.3.2.1.3
+                graphs:
+                    Sensor-Status:
+                        miny: 0
+                        maxy: 2
+                        graphpoints:
+                            Status:
+                                dpName: sensorstatus
+                                lineType: AREA
+                        comments:
+                            - 0 is ok
+                    Sensor-Value:
+                        graphpoints:
+                            Sensor-Value:
+                                dpName: sensorvalue
+                                lineWidth: 2
+                thresholds:
+                    sensor_status:
+                        dsnames: [sensorstatus_sensorstatus]
+                        minval: '0'
+                        maxval: '0'
+                        eventClass: '/HW/Network/Fortinet'
+                        severity: Warning
+                        escalateCount: 2
+
+            Fortigate:
+                description: Fortigate device monitoring
+                thresholds:
+                    cpu_max:
+                        dsnames: [cpu_cpu]
+                        eventClass: /Perf/CPU
+                        maxval: 70
+                        escalateCount: 5
+                datasources:
+                    cpu:
+                        type: SNMP
+                        datapoints:
+                            cpu: GAUGE
+                        oid: 1.3.6.1.4.1.12356.101.4.1.3.0
+                    memusage:
+                        type: SNMP
+                        datapoints:
+                            memusage: GAUGE
+                        oid: 1.3.6.1.4.1.12356.101.4.1.4.0
+                    diskusage:
+                        type: SNMP
+                        datapoints:
+                            diskusage: GAUGE
+                        oid: 1.3.6.1.4.1.12356.101.4.1.6.0
+                    diskcapacity:
+                        type: SNMP
+                        datapoints:
+                            diskcapacity: GAUGE
+                        oid: 1.3.6.1.4.1.12356.101.4.1.7.0
+                    sessions:
+                        type: SNMP
+                        datapoints:
+                            sessions: GAUGE
+                        oid: 1.3.6.1.4.1.12356.101.4.1.8.0
+                graphs:
+                    CPU-load:
+                        miny: 0
+                        maxy: 100
+                        graphpoints:
+                            cpu:
+                                dpName: cpu_cpu
+                                lineType: AREA
+                                includeThresholds: true
+                    Memory:
+                        miny: 0
+                        maxy: 100
+                        graphpoints:
+                            memusage:
+                                dpName: memusage_memusage
+                                lineType: AREA
+                                legend: ${graphPoint/id} in %
+                    Disk:
+                        graphpoints:
+                            diskusage:
+                                dpName: diskusage_diskusage
+                                lineType: AREA
+                                legend: ${graphPoint/id} in Mb
+                    Session-count:
+                        graphpoints:
+                            sessions:
+                                dpName: sessions_sessions
+                                lineType: AREA

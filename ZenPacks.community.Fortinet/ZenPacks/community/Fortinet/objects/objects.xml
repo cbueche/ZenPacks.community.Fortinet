@@ -1,0 +1,23 @@
+<objects>
+<!-- ('', 'zport', 'dmd', 'Events', 'HW', 'Network', 'Fortinet') -->
+<object id="/zport/dmd/Events/HW/Network/Fortinet" module="Products.ZenEvents.EventClass" class="EventClass">
+<property type="text" id="transform" mode="w">
+#!/usr/bin/env python
+#
+# transform for /Events/Status/CiscoFan
+#
+
+# SNMP issues are not important here, other checks will detect them
+import re
+
+match = re.search('No SNMP response received before timeout|Command timed out', evt.summary)
+if (match):
+    # warning is enough
+    evt.severity = 3
+
+if device is not None:
+    if evt is not None:
+        evt.summary = 'sensor threshold crossed, please check the Fortinet administration console'
+</property>
+</object>
+</objects>

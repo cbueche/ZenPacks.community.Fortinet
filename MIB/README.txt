@@ -1,0 +1,1 @@
+These MIB's are here for reference only. They can be loaded into Zenoss to automatically map SNMP traps. See the top-level README.md file for details.
