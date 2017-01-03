@@ -122,8 +122,10 @@ The reason for the warning is probably that both firewall instances see the same
 # To-do
 
 - automate the device class creation for `/Network/Firewall/Fortigate`
+- automate the installation of the MIBs
 - event clear from monitoring/performance template
-- disk usage alertingsß
+- disk usage alertings
+- add a screenshot with real-life data
 
 # Resources
 
