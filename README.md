@@ -8,6 +8,11 @@ This is a Zenpack for [Fortinet FortiGate firewalls](https://www.fortinet.com/pr
 
 I only had FortiGate models 100D and 3000D with OS version 5.x to test my zenpack. Feel free to try it with other models, and report if it works or break. I'm happy to assist you to get it working with other models.
 
+### models
+
+- 100D and 3000D (OS version 5.x) : confirmed by @cbueche
+- Fortigate 800C : confirmed by @mattbze
+
 # Features
 
 - serial number and firmware version in overview page
