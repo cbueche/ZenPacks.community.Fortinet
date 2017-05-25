@@ -10,8 +10,8 @@ I only had FortiGate models 100D and 3000D with OS version 5.x to test my zenpac
 
 ### models
 
-- 100D and 3000D (OS version 5.x) : confirmed by @cbueche
-- Fortigate 800C : confirmed by @mattbze
+- 100D and 3000D (OS version 5.x) : confirmed by [@cbueche](https://github.com/cbueche).
+- Fortigate 800C : confirmed by [@mattbze](https://github.com/mattbze).
 
 # Features
 
